@@ -54,15 +54,34 @@ flags = [
 '-fdata-sections',
 '-nostdlib',
 
-'-I', './src',
-'-I', '../esp-open-rtos/include',
-'-I', '../esp-open-rtos/libc/xtensa-lx106-elf/include',
-'-I', '../esp-open-rtos/extras/rboot-ota',
-'-I', '../esp-open-rtos/FreeRTOS/Source/include',
-'-I', '../esp-open-rtos/FreeRTOS/Source/portable/esp8266',
-'-I', '../esp-open-rtos/lwip/lwip/src/include',
-'-I', '../esp-open-rtos/lwip/include',
-'-I', '../esp-open-rtos/core/include',
+'-D__ets__',
+'-DICACHE_FLASH',
+'-DARDUINO=106',
+'-DBOOT_BIG_FLASH',
+'-DSPIFF_SIZE=65536',
+'-DRBOOT_SPIFFS_0=0x100000',
+'-DRBOOT_SPIFFS_1=0x300000',
+'-DRBOOT_INTEGRATION',
+'-fno-rtti',
+'-fno-exceptions',
+
+'-I', './app',
+'-I', './include',
+'-I', './app/include',
+'-I', '../esp-open-sdk/include',
+'-I', '../esp-open-sdk/sdk/include',
+
+'-I', '../Sming/Sming/rboot/appcode',
+'-I', '../Sming/Sming/rboot/appcode/include',
+'-I', '../Sming/Sming/include',
+'-I', '../Sming/Sming/',
+'-I', '../Sming/Sming/system/include',
+'-I', '../Sming/Sming/Wiring',
+'-I', '../Sming/Sming/Libraries',
+'-I', '../Sming/Sming/SmingCore',
+'-I', '../Sming/Sming/rboot',
+'-I', '../Sming/Sming/rboot/appcode',
+
 ]
 
 
