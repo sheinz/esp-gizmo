@@ -43,12 +43,12 @@ flags = [
 # a "-std=<something>".
 # For a C project, you would set this to something like 'c99' instead of
 # 'c++11'.
-'-std=c++11',
+'-std=gnu99',
 # ...and the same thing goes for the magic -x option which specifies the
 # language that the files to be compiled are written in. This is mostly
 # relevant for c++ headers.
 # For a C project, you would set this to 'c' instead of 'c++'.
-'-x', 'c++',
+'-x', 'c',
 '-DOTA',
 '-ffunction-sections',
 '-fdata-sections',
@@ -57,7 +57,7 @@ flags = [
 '-I', './src',
 '-I', '../esp-open-rtos/include',
 '-I', '../esp-open-rtos/libc/xtensa-lx106-elf/include',
-'-I', '../esp-open-rtos/extras/rboot-ota',
+'-I', '../esp-open-rtos/extras',
 '-I', '../esp-open-rtos/FreeRTOS/Source/include',
 '-I', '../esp-open-rtos/FreeRTOS/Source/portable/esp8266',
 '-I', '../esp-open-rtos/lwip/lwip/src/include',
