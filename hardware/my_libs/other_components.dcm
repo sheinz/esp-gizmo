@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP MOC3021S
+D DIP6, Random Phase Opto-Triac, Vdrm 250V, Ift 15mA
+K Opto-Triac Opto Triac Random Phase
+F http://www.fairchildsemi.com/ds/MO/MOC3020M.pdf
+$ENDCMP
+#
+#End Doc Library
