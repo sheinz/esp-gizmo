@@ -28,10 +28,8 @@ LIBS:opto
 LIBS:atmel
 LIBS:contrib
 LIBS:valves
-LIBS:smps
-LIBS:my_lib
-LIBS:ESP8266
 LIBS:other_components
+LIBS:ESP8266
 LIBS:esp-gizmo-cache
 EELAYER 25 0
 EELAYER END
@@ -119,7 +117,7 @@ F 3 "" H 1200 3200 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	2550 3800 2650 3800
+	2300 3800 2650 3800
 Wire Wire Line
 	2650 3300 2550 3300
 Wire Wire Line
@@ -368,16 +366,16 @@ $EndComp
 $Comp
 L GND #PWR08
 U 1 1 573787F3
-P 2550 4200
-F 0 "#PWR08" H 2550 3950 50  0001 C CNN
-F 1 "GND" H 2550 4050 50  0000 C CNN
-F 2 "" H 2550 4200 50  0000 C CNN
-F 3 "" H 2550 4200 50  0000 C CNN
-	1    2550 4200
+P 2550 4250
+F 0 "#PWR08" H 2550 4000 50  0001 C CNN
+F 1 "GND" H 2550 4100 50  0000 C CNN
+F 2 "" H 2550 4250 50  0000 C CNN
+F 3 "" H 2550 4250 50  0000 C CNN
+	1    2550 4250
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	2550 4150 2550 4200
+	2550 4150 2550 4250
 Connection ~ 2550 3800
 $Comp
 L TRIAC U6
@@ -511,9 +509,9 @@ Wire Wire Line
 Wire Wire Line
 	6500 4200 6300 4200
 Wire Wire Line
-	7350 4800 7850 4800
+	7850 4800 7350 4800
 Wire Wire Line
-	7850 4800 7850 1200
+	7850 1200 7850 4800
 Wire Wire Line
 	7350 3900 7850 3900
 $Comp
@@ -573,7 +571,7 @@ F 1 "CONN_01X02" V 2050 1650 50  0000 C CNN
 F 2 "Connect:bornier2" H 1950 1650 50  0001 C CNN
 F 3 "" H 1950 1650 50  0000 C CNN
 	1    1950 1650
-	-1   0    0    1   
+	-1   0    0    -1  
 $EndComp
 Wire Wire Line
 	2300 1500 2450 1500
@@ -584,8 +582,6 @@ Wire Wire Line
 	8100 2550 8200 2550
 Wire Wire Line
 	8100 1050 8100 2550
-Wire Wire Line
-	2300 1600 2150 1600
 Wire Wire Line
 	2150 1700 2300 1700
 Wire Wire Line
@@ -716,4 +712,24 @@ F 3 "" H 2300 2650 50  0000 C CNN
 $EndComp
 Wire Wire Line
 	2300 2700 2300 2650
+$Comp
+L C C2
+U 1 1 57C09531
+P 2300 4000
+F 0 "C2" H 2325 4100 50  0000 L CNN
+F 1 "100n" H 2325 3900 50  0000 L CNN
+F 2 "Capacitors_SMD:C_0805_HandSoldering" H 2338 3850 50  0001 C CNN
+F 3 "" H 2300 4000 50  0000 C CNN
+	1    2300 4000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2550 4200 2300 4200
+Wire Wire Line
+	2300 4200 2300 4150
+Connection ~ 2550 4200
+Wire Wire Line
+	2300 3800 2300 3850
+Wire Wire Line
+	2300 1600 2150 1600
 $EndSCHEMATC

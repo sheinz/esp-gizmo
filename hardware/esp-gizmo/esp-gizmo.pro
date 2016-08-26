@@ -1,4 +1,4 @@
-update=Fri 26 Aug 2016 01:46:51 PM EEST
+update=2016 August 26, Friday 21:35:57
 version=1
 last_client=kicad
 [pcbnew]
@@ -58,5 +58,5 @@ LibName26=opto
 LibName27=atmel
 LibName28=contrib
 LibName29=valves
-LibName30=/home/yskriyka/kicad/kicad-ESP8266/ESP8266
-LibName31=/home/yskriyka/esp/esp-gizmo/hardware/my_libs/other_components
+LibName30=/Volumes/case-sensitive/esp-gizmo/hardware/my_libs/other_components
+LibName31=/Volumes/case-sensitive/kicad-ESP8266/ESP8266
