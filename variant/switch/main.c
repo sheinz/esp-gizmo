@@ -10,6 +10,7 @@
 #include "ssid_config.h"
 
 #include "key_task.h"
+#include "load_driver.h"
 
 
 void main_task(void *pvParameters)
@@ -19,8 +20,9 @@ void main_task(void *pvParameters)
     while (1) {
         if (xQueueReceive(key_queue, &key_event, portMAX_DELAY)) {
             printf("received event, key=%d, status=%s\n", 
-                    key_event.key,
+                    key_event.key_index,
                     key_event.on ? "on" : "off");
+            load_driver_set(key_event.key_index, key_event.on);
         } else {
             printf("waiting for key event timeout\n");
         }
@@ -32,6 +34,7 @@ void user_init(void)
     uart_set_baud(0, 115200);
 
     key_task_init();
+    load_driver_init();
 
     struct sdk_station_config config = {
         .ssid = WIFI_SSID,

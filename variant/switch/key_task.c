@@ -23,7 +23,7 @@ static const uint8_t key_pins[NUMBER_OF_KEYS] = {13, 12, 14};
 static inline void send_key_event(uint8_t key, bool on)
 {
     key_event_t event;
-    event.key = key;    
+    event.key_index = key;    
     event.on = on;
     if (xQueueSend(key_queue, &event, 0) != pdTRUE) {
         //TODO: handle send fail

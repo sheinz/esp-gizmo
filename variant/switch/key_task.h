@@ -4,14 +4,8 @@
 #include <queue.h>
 #include <stdbool.h>
 
-typedef enum {
-    KEY_0 = 0,
-    KEY_1,
-    KEY_2,
-} key_enum_t;
-
 typedef struct {
-    key_enum_t key;
+    uint8_t key_index;
     bool on;
 } key_event_t;
 
