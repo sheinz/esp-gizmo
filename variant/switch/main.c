@@ -14,21 +14,35 @@
 
 #include "key_task.h"
 #include "load_driver.h"
+#include "mqtt_task.h"
 
 
 void main_task(void *pvParameters)
 {
     key_event_t key_event;
+    mqtt_event_t mqtt_event;
 
     while (1) {
-        if (xQueueReceive(key_queue, &key_event, portMAX_DELAY)) {
+        if (xQueueReceive(key_queue, &key_event, 0)) {
             printf("received event, key=%d, status=%s\n", 
                     key_event.key_index,
                     key_event.on ? "on" : "off");
             load_driver_set(key_event.key_index, key_event.on);
-        } else {
-            printf("waiting for key event timeout\n");
+        } 
+        if (mqtt_task_get_event(&mqtt_event)) {
+            printf("receved mqtt event, load=%d, status=%s\n",
+                    mqtt_event.param,
+                    mqtt_event.cmd == MQTT_CMD_TURN_ON ? "on" : "off");
+            if (mqtt_event.cmd == MQTT_CMD_TURN_ON) {
+                load_driver_set(mqtt_event.param, true);
+            } else if (mqtt_event.cmd == MQTT_CMD_TURN_OFF) {
+                load_driver_set(mqtt_event.param, false);
+            } else if (mqtt_event.cmd == MQTT_CMD_REQ_STATUS){
+                printf("Request status\n");
+            }
         }
+        /* taskYIELD();  */
+        vTaskDelay(10 / portTICK_RATE_MS); 
     }
 }
 
@@ -42,6 +56,7 @@ void user_init(void)
 
     key_task_init();
     load_driver_init();
+    mqtt_task_init();
 
     struct sdk_station_config config = {
         .ssid = WIFI_SSID,
@@ -55,5 +70,5 @@ void user_init(void)
     printf("Starting TFTP server...");
     ota_tftp_init_server(TFTP_PORT);
 
-    xTaskCreate(main_task, (signed char *)"main", 1024, NULL, 3, NULL);
+    xTaskCreate(main_task, (signed char *)"main", 1024, NULL, 5, NULL);
 }

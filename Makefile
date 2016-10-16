@@ -1,6 +1,7 @@
 PROGRAM = esp-gizmo
 PROGRAM_SRC_DIR = ./src
-EXTRA_COMPONENTS = extras/i2c extras/bmp280 extras/dht extras/bmp180 extras/rboot-ota
+EXTRA_COMPONENTS := extras/i2c extras/bmp280 extras/dht extras/bmp180
+EXTRA_COMPONENTS += extras/rboot-ota extras/paho_mqtt_c
 
 VARIANT ?= switch
 DEVICE_IP ?= 192.168.0.108
