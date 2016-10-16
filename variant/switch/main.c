@@ -9,6 +9,9 @@
 
 #include "ssid_config.h"
 
+#include "ota-tftp.h"
+#include "rboot-api.h"
+
 #include "key_task.h"
 #include "load_driver.h"
 
@@ -33,6 +36,10 @@ void user_init(void)
 {
     uart_set_baud(0, 115200);
 
+    rboot_config conf = rboot_get_config();
+    printf("esp-gizmo. Running on flash slot %d / %d\n",
+           conf.current_rom, conf.count);
+
     key_task_init();
     load_driver_init();
 
@@ -45,5 +52,8 @@ void user_init(void)
     sdk_wifi_set_opmode(STATION_MODE);
     sdk_wifi_station_set_config(&config);
 
-    xTaskCreate(main_task, (signed char *)"main", 1024, NULL, 2, NULL);
+    printf("Starting TFTP server...");
+    ota_tftp_init_server(TFTP_PORT);
+
+    xTaskCreate(main_task, (signed char *)"main", 1024, NULL, 3, NULL);
 }
