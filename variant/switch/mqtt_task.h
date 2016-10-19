@@ -18,9 +18,15 @@ typedef struct {
 #define NUMBER_OF_LOADS     3
 #define NUMBER_OF_SWITCHES  3
 
+typedef enum {
+    STATUS_SWITCH = 1,
+    STATUS_LOAD = 2,
+} mqtt_status_enum_t;
+
 typedef struct {
-    bool loads[NUMBER_OF_LOADS];
-    bool switches[NUMBER_OF_LOADS];
+    mqtt_status_enum_t kind;
+    uint8_t index;
+    bool state;
 } mqtt_status_t;
 
 void mqtt_task_init();

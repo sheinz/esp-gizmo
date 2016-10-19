@@ -10,7 +10,9 @@ void load_driver_init();
 
 /**
  * Turn load on/off
+ *
+ * @return True if value is update. If value is the same - false.
  */
-void load_driver_set(uint8_t load_index, bool on);
+bool load_driver_set(uint8_t load_index, bool on);
 
 #endif /* end of include guard: __LOAD_DIRVER_H__ */

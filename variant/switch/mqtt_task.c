@@ -70,8 +70,27 @@ static void topic_received(mqtt_message_data_t *md)
 
 static bool send_status(const mqtt_status_t *status)
 {
-    printf("mqtt: Sending status\n");
-    return true;
+    char data[1] = "\0";
+    char topic_buf[64];
+    mqtt_message_t msg;
+
+    data[0] = status->state ? '1' : '0';
+    msg.payload = data;
+    msg.payloadlen = 1;
+    msg.dup = 0;
+    msg.qos = MQTT_QOS1;
+    msg.retained = 0;
+
+    if (status->kind == STATUS_SWITCH) {
+        sprintf(topic_buf, "%s%d", topic_switches, status->index);
+    } else if (status->kind == STATUS_LOAD) {
+        strcpy(topic_buf, topic_lamps);
+        int len = strlen(topic_buf);
+        topic_buf[len-1] = '0' + status->index;
+    }
+    printf("mqtt: publishing topic %s = %d", topic_buf, status->state);
+
+    return mqtt_publish(&client, topic_buf, &msg) == MQTT_SUCCESS;
 }
 
 static inline bool init_mqtt_connection()

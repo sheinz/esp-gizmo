@@ -21,13 +21,24 @@ void main_task(void *pvParameters)
 {
     key_event_t key_event;
     mqtt_event_t mqtt_event;
+    mqtt_status_t mqtt_status;
 
     while (1) {
         while (xQueueReceive(key_queue, &key_event, 0)) {
             printf("received event, key=%d, status=%s\n", 
                     key_event.key_index,
                     key_event.on ? "on" : "off");
-            load_driver_set(key_event.key_index, key_event.on);
+
+            mqtt_status.index = key_event.key_index;
+            mqtt_status.state = key_event.on;
+            mqtt_status.kind = STATUS_SWITCH;
+            mqtt_task_send_status(&mqtt_status);
+
+            if (load_driver_set(key_event.key_index, key_event.on)) {
+                // if the load state has changed send also its new state
+                mqtt_status.kind = STATUS_LOAD; 
+                mqtt_task_send_status(&mqtt_status);
+            }
         } 
         while (mqtt_task_get_event(&mqtt_event)) {
             printf("receved mqtt event, load=%d, status=%s\n",
@@ -39,6 +50,7 @@ void main_task(void *pvParameters)
                 load_driver_set(mqtt_event.param, false);
             } else if (mqtt_event.cmd == MQTT_CMD_REQ_STATUS){
                 printf("Request status\n");
+                // TODO: implement
             }
         }
         taskYIELD(); 
