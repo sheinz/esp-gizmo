@@ -19,8 +19,12 @@ static mqtt_client_t client = mqtt_client_default;
 static uint8_t mqtt_buf[MQTT_BUF_SIZE];
 static uint8_t mqtt_read_buf[MQTT_BUF_SIZE];
 static bool connected = false;
-const static char cmd_topic[] = "/esp-gizmo-switch/room1/cmd";
-const static char status_topic[] = "/esp-gizmo-switch/room1/status";
+
+/**
+ * Topic format: /<device type>/<location>/[lamp/switch]/<index>
+ */
+const static char topic_lamps[] = "/esp-gizmo-switch/room1/lamp/+";
+const static char topic_switches[] = "/esp-gizmo-switch/room1/switch/";
 
 #define SEND_QUEUE_SIZE     4
 #define RECEIVE_QUEUE_SIZE  4
@@ -31,20 +35,27 @@ static xQueueHandle receive_queue;
 static void topic_received(mqtt_message_data_t *md)
 {
     printf("mqtt: topic received\n");
+
     mqtt_event_t ev;
     char *data = (char*)md->message->payload;
-
-    if (md->message->payloadlen != 3) {
+    char *topic = md->topic->lenstring.data;
+    int topic_len = md->topic->lenstring.len;
+    
+    if (md->message->payloadlen != 1) {
         printf("mqtt: Invalid payload len\n");
         return;
     }
+    if (topic_len != strlen(topic_lamps)) {
+        printf("mqtt: Invalid topic len\n");
+        return;
+    }
 
-    ev.param = data[0] - '0';
-    if (data[2] == '0') {
+    ev.param = topic[topic_len - 1] - '0';
+    if (data[0] == '0') {
         ev.cmd = MQTT_CMD_TURN_OFF;
-    } else if (data[2] == '1') {
+    } else if (data[0] == '1') {
         ev.cmd = MQTT_CMD_TURN_ON;
-    } else if (data[2] == '?') {
+    } else if (data[0] == '?') {
         ev.cmd = MQTT_CMD_REQ_STATUS;
     } else {
         printf("mqtt: Invalid argument\n");
@@ -113,8 +124,7 @@ static void mqtt_task(void *pvParams)
             continue;
         }
         printf("mqtt: Connection established\n");
-        if (mqtt_subscribe(&client, "/esp-gizmo-switch/room1/cmd", 
-                    MQTT_QOS1, topic_received)) {
+        if (mqtt_subscribe(&client, topic_lamps, MQTT_QOS1, topic_received)) {
             printf("mqtt: Subsciption failed\n");
             continue;
         }
@@ -122,17 +132,16 @@ static void mqtt_task(void *pvParams)
 
         while (true) {
             mqtt_status_t status;
-            while (xQueueReceive(send_queue, &status, 1000/portTICK_RATE_MS) 
-                    == pdTRUE) {
+            while (xQueueReceive(send_queue, &status, 0) == pdTRUE) {
                 if (!send_status(&status)) {
                     printf("mqtt: Send status error\n");
                     break;
                 }
             }
-            if (mqtt_yield(&client, 1000) == MQTT_DISCONNECTED) {
+            if (mqtt_yield(&client, 1) == MQTT_DISCONNECTED) {
                 break;
             }
-            /* taskYIELD(); */
+            taskYIELD();
         }
         printf("mqtt: Connection dropped\n");
         mqtt_network_disconnect(&network);
@@ -144,7 +153,7 @@ void mqtt_task_init()
     send_queue = xQueueCreate(SEND_QUEUE_SIZE, sizeof(mqtt_status_t));
     receive_queue = xQueueCreate(RECEIVE_QUEUE_SIZE, sizeof(mqtt_event_t));
 
-    xTaskCreate(mqtt_task, (signed char *)"mqtt_task", 512, NULL, 4, NULL);
+    xTaskCreate(mqtt_task, (signed char *)"mqtt_task", 512, NULL, 1, NULL);
 }
 
 bool mqtt_task_get_event(mqtt_event_t *ev)

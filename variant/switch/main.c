@@ -23,13 +23,13 @@ void main_task(void *pvParameters)
     mqtt_event_t mqtt_event;
 
     while (1) {
-        if (xQueueReceive(key_queue, &key_event, 0)) {
+        while (xQueueReceive(key_queue, &key_event, 0)) {
             printf("received event, key=%d, status=%s\n", 
                     key_event.key_index,
                     key_event.on ? "on" : "off");
             load_driver_set(key_event.key_index, key_event.on);
         } 
-        if (mqtt_task_get_event(&mqtt_event)) {
+        while (mqtt_task_get_event(&mqtt_event)) {
             printf("receved mqtt event, load=%d, status=%s\n",
                     mqtt_event.param,
                     mqtt_event.cmd == MQTT_CMD_TURN_ON ? "on" : "off");
@@ -41,8 +41,7 @@ void main_task(void *pvParameters)
                 printf("Request status\n");
             }
         }
-        /* taskYIELD();  */
-        vTaskDelay(10 / portTICK_RATE_MS); 
+        taskYIELD(); 
     }
 }
 
@@ -70,5 +69,5 @@ void user_init(void)
     printf("Starting TFTP server...");
     ota_tftp_init_server(TFTP_PORT);
 
-    xTaskCreate(main_task, (signed char *)"main", 1024, NULL, 5, NULL);
+    xTaskCreate(main_task, (signed char *)"main", 1024, NULL, 1, NULL);
 }
