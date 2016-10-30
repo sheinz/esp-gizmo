@@ -81,5 +81,5 @@ void user_init(void)
     printf("Starting TFTP server...");
     ota_tftp_init_server(TFTP_PORT);
 
-    xTaskCreate(main_task, (signed char *)"main", 1024, NULL, 1, NULL);
+    xTaskCreate(main_task, "main", 1024, NULL, 1, NULL);
 }

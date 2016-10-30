@@ -61,6 +61,5 @@ void key_task_init()
 
     key_queue = xQueueCreate(KEY_QUEUE_SIZE, sizeof(key_event_t));
 
-    xTaskCreate(scan_key_task, (signed char *)"scan_key_task", 256, 
-            NULL, 1, NULL);
+    xTaskCreate(scan_key_task, "scan_key_task", 256, NULL, 1, NULL);
 }

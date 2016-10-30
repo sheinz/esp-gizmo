@@ -172,7 +172,7 @@ void mqtt_task_init()
     send_queue = xQueueCreate(SEND_QUEUE_SIZE, sizeof(mqtt_status_t));
     receive_queue = xQueueCreate(RECEIVE_QUEUE_SIZE, sizeof(mqtt_event_t));
 
-    xTaskCreate(mqtt_task, (signed char *)"mqtt_task", 512, NULL, 1, NULL);
+    xTaskCreate(mqtt_task, "mqtt_task", 512, NULL, 1, NULL);
 }
 
 bool mqtt_task_get_event(mqtt_event_t *ev)
