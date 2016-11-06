@@ -9,7 +9,7 @@
 #define KEY_SCAN_PERIOD     100  // scan period in ms
 #define NUMBER_OF_KEYS      3
 
-xQueueHandle key_queue;
+QueueHandle_t key_queue;
 
 typedef enum {
     KEY_STATE_UNKNWON = 0,
@@ -23,7 +23,7 @@ static const uint8_t key_pins[NUMBER_OF_KEYS] = {13, 12, 14};
 static inline void send_key_event(uint8_t key, bool on)
 {
     key_event_t event;
-    event.key_index = key;    
+    event.key_index = key;
     event.on = on;
     if (xQueueSend(key_queue, &event, 0) != pdTRUE) {
         //TODO: handle send fail
@@ -39,15 +39,15 @@ static void scan_key_task(void *pvParameters)
                 send_key_event(i, value);
             } else if (key_states[i] == KEY_STATE_ON && !value) {
                 // key has just turned off
-                send_key_event(i, value);   
+                send_key_event(i, value);
             } else if (key_states[i] == KEY_STATE_OFF && value) {
                 // key has just turned on
                 send_key_event(i, value);
             }
             key_states[i] = value ? KEY_STATE_ON : KEY_STATE_OFF;
         }
-        
-        vTaskDelay(KEY_SCAN_PERIOD / portTICK_RATE_MS);
+
+        vTaskDelay(KEY_SCAN_PERIOD / portTICK_PERIOD_MS);
     }
 }
 

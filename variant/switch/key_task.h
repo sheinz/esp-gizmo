@@ -9,7 +9,7 @@ typedef struct {
     bool on;
 } key_event_t;
 
-extern xQueueHandle key_queue;
+extern QueueHandle_t key_queue;
 
 void key_task_init();
 

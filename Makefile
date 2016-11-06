@@ -2,9 +2,10 @@ PROGRAM = esp-gizmo
 PROGRAM_SRC_DIR = ./src
 EXTRA_COMPONENTS := extras/i2c extras/bmp280 extras/dht extras/bmp180
 EXTRA_COMPONENTS += extras/rboot-ota extras/paho_mqtt_c
+EXTRA_COMPONENTS += extras/onewire extras/ds18b20
 
 VARIANT ?= switch
-DEVICE_IP ?= 192.168.0.108
+DEVICE_IP ?= 192.168.0.107
 
 ifeq ($(VARIANT), sensor)
 	PROGRAM_SRC_DIR += variant/sensor
@@ -24,5 +25,5 @@ upload: all
 	@echo "Upload finished"
 endif
 ifeq ($(UNAME), Linux)
-	# TODO: check upload in linux 
+	# TODO: check upload in linux
 endif

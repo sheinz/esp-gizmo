@@ -28,7 +28,7 @@ uint8_t const dht_pin = 12;
 static bmp280_t bmp280_dev;
 static bmp180_constants_t bmp180_constants;
 
-#define API_KEY ""
+#define API_KEY "SQR1QEVFNW0SHPPU"
 #define THINGSPEAK_HOST     "api.thingspeak.com"
 #define THINGSPEAK_PORT     80
 #define THINGSPEAK_GET_URL  "http://" THINGSPEAK_HOST "/update?api_key="\

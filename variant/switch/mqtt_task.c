@@ -23,14 +23,14 @@ static bool connected = false;
 /**
  * Topic format: /<device type>/<location>/[lamp/switch]/<index>
  */
-const static char topic_lamps[] = "/esp-gizmo-switch/room1/lamp/+";
-const static char topic_switches[] = "/esp-gizmo-switch/room1/switch/";
+const static char topic_lamps[] = "/esp-gizmo-switch/kitchen/lamp/+";
+const static char topic_switches[] = "/esp-gizmo-switch/kitchen/switch/";
 
 #define SEND_QUEUE_SIZE     4
 #define RECEIVE_QUEUE_SIZE  4
 
-static xQueueHandle send_queue;
-static xQueueHandle receive_queue;
+static QueueHandle_t send_queue;
+static QueueHandle_t receive_queue;
 
 static void topic_received(mqtt_message_data_t *md)
 {
@@ -40,7 +40,7 @@ static void topic_received(mqtt_message_data_t *md)
     char *data = (char*)md->message->payload;
     char *topic = md->topic->lenstring.data;
     int topic_len = md->topic->lenstring.len;
-    
+
     if (md->message->payloadlen != 1) {
         printf("mqtt: Invalid payload len\n");
         return;
@@ -96,7 +96,7 @@ static bool send_status(const mqtt_status_t *status)
 static inline bool init_mqtt_connection()
 {
     int ret = 0;
-    char client_id[] = "esp-gizmo-switch";
+    char client_id[] = "esp-gizmo-switch_2";
 
     mqtt_network_new(&network);
     ret = mqtt_network_connect(&network, MQTT_HOST, MQTT_PORT);
@@ -130,13 +130,13 @@ static inline bool init_mqtt_connection()
 static void mqtt_task(void *pvParams)
 {
     while (true) {
-        vTaskDelay(100 / portTICK_RATE_MS);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
         connected = false;
         xQueueReset(send_queue);
         xQueueReset(receive_queue);
         if (sdk_wifi_station_get_connect_status() != STATION_GOT_IP) {
             printf("mqtt: Waiting for WiFi connection\n");
-            vTaskDelay(1000/portTICK_RATE_MS);
+            vTaskDelay(1000/portTICK_PERIOD_MS);
             continue;
         }
         if (!init_mqtt_connection()) {

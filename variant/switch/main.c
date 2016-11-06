@@ -1,21 +1,46 @@
-#include "espressif/esp_common.h"
-#include "esp/uart.h"
-#include "FreeRTOS.h"
-#include "task.h"
-#include "esp8266.h"
+#include <espressif/esp_common.h>
+#include <esp/uart.h>
+#include <FreeRTOS.h>
+#include <task.h>
+#include <esp8266.h>
 
 #include <stdio.h>
 #include <string.h>
 
-#include "ssid_config.h"
+#include <ssid_config.h>
 
-#include "ota-tftp.h"
-#include "rboot-api.h"
+#include <ds18b20/ds18b20.h>
+#include <ota-tftp.h>
+#include <rboot-api.h>
 
 #include "key_task.h"
 #include "load_driver.h"
 #include "mqtt_task.h"
 
+
+#define SENSOR_GPIO         0
+
+void health_state(void *pvParameters)
+{
+    ds18b20_addr_t temp_sensor_addr;
+
+    int sensor_count = ds18b20_scan_devices(SENSOR_GPIO, &temp_sensor_addr, 1);
+    if (sensor_count != 1) {
+        printf("No sensors found on one wire bus\n");
+        vTaskDelete(NULL);
+        return;
+    }
+
+    while (1) {
+        if (!ds18b20_measure(SENSOR_GPIO, temp_sensor_addr, /*wait=*/false)) {
+            printf("Measurement error\n");
+        }
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        float temp = ds18b20_read_temperature(SENSOR_GPIO, temp_sensor_addr);
+        printf("Temperature: %f\n", temp);
+        vTaskDelay(5000 / portTICK_PERIOD_MS);
+    }
+}
 
 void main_task(void *pvParameters)
 {
@@ -25,7 +50,7 @@ void main_task(void *pvParameters)
 
     while (1) {
         while (xQueueReceive(key_queue, &key_event, 0)) {
-            printf("received event, key=%d, status=%s\n", 
+            printf("received event, key=%d, status=%s\n",
                     key_event.key_index,
                     key_event.on ? "on" : "off");
 
@@ -36,10 +61,10 @@ void main_task(void *pvParameters)
 
             if (load_driver_set(key_event.key_index, key_event.on)) {
                 // if the load state has changed send also its new state
-                mqtt_status.kind = STATUS_LOAD; 
+                mqtt_status.kind = STATUS_LOAD;
                 mqtt_task_send_status(&mqtt_status);
             }
-        } 
+        }
         while (mqtt_task_get_event(&mqtt_event)) {
             printf("receved mqtt event, load=%d, status=%s\n",
                     mqtt_event.param,
@@ -53,7 +78,7 @@ void main_task(void *pvParameters)
                 // TODO: implement
             }
         }
-        taskYIELD(); 
+        taskYIELD();
     }
 }
 
@@ -82,4 +107,5 @@ void user_init(void)
     ota_tftp_init_server(TFTP_PORT);
 
     xTaskCreate(main_task, "main", 1024, NULL, 1, NULL);
+    xTaskCreate(health_state, "health_state", 512, NULL, 1, NULL);
 }
